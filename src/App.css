@@ -131,3 +131,9 @@ h1{
 .choosable-user {
   font-size: larger;
 }
+.timestamp {
+  font-size: 0.75em;
+  color: #888;
+  margin-top: 4px;
+  text-align: right;
+}

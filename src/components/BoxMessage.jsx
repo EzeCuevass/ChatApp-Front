@@ -2,6 +2,12 @@ import { Box } from "@chakra-ui/react";
 import React, { useContext} from "react";
 import { UserContext } from "../context/userContext.jsx";
 export const BoxMessage = ({ msg }) => {
+    const formatTimestamp = (timestamp) => {
+    if (!timestamp) return "";
+    const date = new Date(timestamp);
+    return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+};
+    
     const { user } = useContext(UserContext);
     const msgUsername = msg.user ? msg.user.username : "Anonymous";
     const currentUsername = user ? user.username : "Anonymous";
@@ -25,6 +31,11 @@ export const BoxMessage = ({ msg }) => {
                 wordBreak="break-word"
             >
                 <strong>{msg.user ? msg.user.username : "Anonymous"}:</strong> {msg.message}
+                {msg.timestamp && (
+                    <div className="timestamp">
+                        {formatTimestamp(msg.timestamp)}
+                    </div>
+                )}
             </Box>
         </Box>
     )
