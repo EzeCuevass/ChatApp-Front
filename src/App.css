@@ -36,3 +36,98 @@
     transform: rotate(360deg);
   }
 }
+header{
+  display: flex;
+  flex-direction: row;
+  background-color: #282c34;
+  color: white;
+  text-align: center;
+  justify-content: space-around;
+  align-items: center;
+  height: 20vh;
+}
+.logo{
+  align-items: center;
+  width: 15vw;
+}
+svg{
+  width: 100%;
+  height: 100%;
+}
+h1{
+  font-size: 2.5rem;
+  height: 100%;
+}
+#AppName{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#second-box{
+  display: flex;
+  width: 15vw;
+  justify-content: space-between;
+}
+#main{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+  width: 100vw;
+  background-color: #282c34;
+}
+.box-chats{
+  display: flex;
+  flex-direction: column;
+  /* justify-content: center; */
+  align-items: center;
+  width: 30%;
+  height: 100%;
+  border: red 1px solid;
+}
+.chat{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  width: 70%;
+  height: 100%;
+}
+.individual-chat{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 20%;
+  border: 1px solid #1a1c22;
+}
+.chat-messages{
+  display: flex;
+  width: 100%;
+  overflow-y: auto;
+}
+.chat-input{
+  display: flex;
+  width: 100%;
+  height: 35%;
+  justify-content: center;
+  align-items: center;
+  background-color: #1a1c22;
+}
+.input-container{
+  display: flex;
+  flex-direction: row;
+  width: 90%;
+}
+.chat-header{
+  background-color: #1a1c22;
+  width: 100%;
+}
+.InputMessage{
+  width: 100%;
+}
+.choosable-user {
+  font-size: larger;
+}
