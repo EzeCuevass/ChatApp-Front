@@ -8,10 +8,13 @@ import axios from "axios"
 import { API_URL } from "../config.js"
 import { UserContext } from "../context/userContext.jsx"
 import { useContext } from "react"
+import { SocketContext } from "../context/socketContext.jsx"
 const DialogLogin = () => {
   // Login dialog component
   // Uses the UserContext to access the login function and user data
   const { login, user } = useContext(UserContext);
+  // Accessing the socket context
+  const socket = useContext(SocketContext);
   // Async function to handle login
   async function logIn(event) {
     event.preventDefault();
@@ -24,6 +27,7 @@ const DialogLogin = () => {
     }, {withCredentials:true})
     .then(res => {
       login(res.data.user, res.data.token)
+      socket.emit('setusername', { username: res.data.user.username, token: res.data.token });
     })
     .catch(err => {
       console.log(err);

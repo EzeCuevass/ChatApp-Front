@@ -38,7 +38,7 @@ export const DialogDeleteGroup = ({idGroup, groupName}) => {
             .catch(err => {
                 console.error("Error deleting group:", err);
             });
-            socket.emit('updateuser', user);
+            socket.emit('updateusers');
         } else {
             alert("Group name does not match. Please try again.");
         }

@@ -35,7 +35,7 @@ export const CreateGroup = () => {
                 "name": groupname
             })
         })    
-        socket.emit('updateuser', user);
+        socket.emit('updateusers');
     }
     return(
         <Dialog.Root>

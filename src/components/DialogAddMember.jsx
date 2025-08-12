@@ -34,7 +34,7 @@ export const DialogAddMember = ({idGroup}) => {
                 "idgroup": idGroup
             })
         })
-        socket.emit('updateuser', user)
+        socket.emit('updateusers')
     }
     // Effect to fetch search results based on input value
     // It fetches users from the server that match the input value

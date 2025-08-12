@@ -24,6 +24,7 @@ const Main = () => {
         .then(data => {
             setLastMessage(data);
         })
+        .catch(err => console.error(err));
     }, []);
 
     return (
