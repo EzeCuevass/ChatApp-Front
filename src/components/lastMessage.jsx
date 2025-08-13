@@ -5,7 +5,7 @@ import { useState } from "react";
 export const LastMessage = ({ id }) => {
     // LastMessage component
     // Displays the last message in the chat
-    const [lastMessage, setLastMessage] = useState("");
+    const [lastMessage, setLastMessage] = useState({});
     useEffect(()=> {
         // Handler to receive the last message from the server
         const lastMessageHandler = (lastMessage) => {
@@ -20,16 +20,18 @@ export const LastMessage = ({ id }) => {
                     ) {
                         setLastMessage("¡Envia el primer mensaje!");
                     } else {
-                        setLastMessage(lastMessage.lastmessage.message);
+                        setLastMessage(lastMessage.lastmessage);
                     }
                 }
+                if (lastMessage.user){
+                    setLastMessage(lastMessage);
+                }
                 // If the last message is an object, extract the message property
-            } else {
-                // If it's a string, set it directly 
-                setLastMessage(lastMessage || "¡Envia el primer mensaje!");
             }
         }
         
+        
+
         // If id is not provided, emits 'getlastmessage' to get the last message for the current user
         if (!id){
             socket.emit('getlastmessage')
@@ -48,9 +50,22 @@ export const LastMessage = ({ id }) => {
             socket.off('lastmessagefront', lastMessageHandler);
         }
     },[id])
+    const formatTime = (timestamp) => {
+            if (!timestamp) return "";
+            const date = new Date(timestamp);
+            return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        };
     return (
         <div className="last-message">
-            <p>{lastMessage}</p>
+            <p>
+                <strong>
+                    {lastMessage.user?.username || lastMessage.user?.name || "Anónimo"}
+                </strong>
+                : {lastMessage.message}
+                <span className="timestamp">
+                    {formatTime(lastMessage.timestamp)}
+                </span>
+            </p>
         </div>
     );
 };
