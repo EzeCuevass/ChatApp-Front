@@ -29,8 +29,6 @@ const GroupChat = () => {
         <div className="chat">
                 <div className="chat-header">
                     <h1>{group ? group.name : 'Loading...'}</h1>
-                    <p>{group && user && group?.useradmin._id == user.id
-                     ? "Llego el admin" : "Honor al admin"}</p>
                      {group && user && group?.useradmin._id == user.id
                      ? <div className="admin-controls">
                         <DialogAddMember idGroup={id} />
