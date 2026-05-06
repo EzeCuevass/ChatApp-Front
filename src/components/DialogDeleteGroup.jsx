@@ -6,29 +6,20 @@ import { useState , useContext} from "react"
 import { SocketContext } from "../context/socketContext.jsx"
 import { UserContext } from "../context/userContext.jsx"
 export const DialogDeleteGroup = ({idGroup, groupName}) => {
-    // Dialog Delete Group Component
-    // This component makes a dialog to delete a group
-    // It requires the group ID and group name to confirm deletion
     const socket = useContext(SocketContext);
-    const { user } = useContext(UserContext);
-    // State to manage input value
+    const { user, token } = useContext(UserContext);
     const [inputValue, setInputValue] = useState("");
-    // Extracting the token from localStorage
-    const token = localStorage.getItem('token');
-    const tokenparseado = JSON.parse(token);
-    // Function to handle group deletion
+
     async function deleteGroup(event) {
         event.preventDefault();
         const form = event.target;
         const groupname = form.groupname.value;
-        // Check if the input matches the group name
-        // If it matches, proceed with deletion
         if (groupname === groupName) {
-            await fetch(`${API_URL}group/deleteGroup:id?id=${idGroup}`, {
+            await fetch(`${API_URL}group/${idGroup}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
-                    "currentUser": tokenparseado
+                    "currentUser": token
                 }
             })
             .then(res => res.json())

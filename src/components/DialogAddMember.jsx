@@ -6,28 +6,19 @@ import { API_URL } from "../config.js"
 import { SocketContext } from "../context/socketContext.jsx"
 import { UserContext } from "../context/userContext.jsx"
 export const DialogAddMember = ({idGroup}) => {
-    // Add Member Dialog Component
-    //  This component makes a dialog to add members to a group
-
-    // State to hold the input value and search results
     const [inputValue, setInputValue] = useState("");
     const [searchResults, setSearchResults] = useState([]);
-    // State to hold the search input value and results
-    const token = localStorage.getItem('token');
-    const tokenparseado = JSON.parse(token);
-    
+
     const socket = useContext(SocketContext);
-    
-    const { user } = useContext(UserContext);
-    // Async function to add a member to the group
-    // It sends a PUT request to the server with the member's ID and group ID    
+    const { user, token } = useContext(UserContext);
+
     async function addMember(event,userId) {
         event.preventDefault();
         await fetch(`${API_URL}group/addMembers`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
-                "currentUser": tokenparseado
+                "currentUser": token
             },
             body: JSON.stringify({
                 "member": userId,
@@ -58,7 +49,7 @@ export const DialogAddMember = ({idGroup}) => {
                 </Button>
             </Dialog.Trigger>
             <Portal>
-                <form>
+                <form onSubmit={e => e.preventDefault()}>
                     <Dialog.Backdrop />
                     <Dialog.Positioner>
                         <Dialog.Content>
@@ -78,17 +69,13 @@ export const DialogAddMember = ({idGroup}) => {
                                                 />
                                             </Collapsible.Root>
                                         </Field.Root>
-                                        {/* Show search results */}
                                         {inputValue.length > 0 && (
                                             <Box mt={2} color="gray.500">
                                                 {searchResults.length > 0
                                                     ? searchResults.map(user => (
-                                                        // Map through search results and display each user
-                                                        // If the user is already in the group, show a message
-                                                        // Otherwise, show an "Add" button
                                                         <div key={user._id || user.id}>
                                                             <span className="choosable-user">{user.username}</span>
-                                                            {user.groups.length > 0 && user.groups.find(g => g?.group?._id == idGroup) 
+                                                            {user.groups.length > 0 && user.groups.find(g => g?.group?._id === idGroup) 
                                                             ? " User already in group" 
                                                             : <Button onClick={(e) => addMember(e, user._id || user.id)}>Add</Button>}
                                                         </div>
@@ -103,7 +90,7 @@ export const DialogAddMember = ({idGroup}) => {
                                 <Dialog.ActionTrigger asChild>
                                     <Button variant="outline">Cancel</Button>
                                 </Dialog.ActionTrigger>
-                                <Button type="submit">Add Member</Button>
+                                <Button variant="outline">Close</Button>
                             </Dialog.Footer>
                             <Dialog.CloseTrigger asChild>
                                 <CloseButton size="sm" />

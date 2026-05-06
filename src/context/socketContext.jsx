@@ -1,15 +1,18 @@
-import React, {createContext} from 'react';
-import {io} from 'socket.io-client';
+import React, { createContext, useMemo } from 'react';
+import { io } from 'socket.io-client';
 import { API_URL } from '../config.js';
-export const SocketContext = createContext();
-// Create a socket connection
-export const socket = io(API_URL)
 
-export const SocketProvider = ({children}) => {
+export const SocketContext = createContext();
+
+export const SocketProvider = ({ children }) => {
+    const socket = useMemo(() => io(API_URL, {
+        autoConnect: true,
+        reconnection: true
+    }), []);
+
     return (
-        // Provide the socket connection to the context for using in components
         <SocketContext.Provider value={socket}>
             {children}
         </SocketContext.Provider>
-    )
+    );
 };

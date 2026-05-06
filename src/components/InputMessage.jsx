@@ -39,7 +39,7 @@ const InputMessage = ({idGroup}) => {
                 <Input 
                 placeholder="Write a message..."
                 value={message}
-                onChange={(e) => user ? setMessage(e.target.value, user.id) : setMessage(e.target.value)}
+                onChange={(e) => setMessage(e.target.value)}
                 ></Input>
                 <Button placeholder="Send" type="submit">Send</Button>
             </Group>

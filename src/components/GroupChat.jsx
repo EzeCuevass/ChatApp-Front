@@ -29,7 +29,17 @@ const GroupChat = () => {
         <div className="chat">
                 <div className="chat-header">
                     <h1>{group ? group.name : 'Loading...'}</h1>
-                     {group && user && group?.useradmin._id == user.id
+                    <p>
+                        Group members: 
+                        {group ?
+                            group.users.map((user, index) => (
+                                <span key={index}>
+                                    {user.user.username}
+                                    {index < group.users.length - 1 ? ', ' : '.'}
+                                </span>
+                            )): 'Loading...'}
+                    </p>
+                     {group && user && group?.useradmin._id === user.id
                      ? <div className="admin-controls">
                         <DialogAddMember idGroup={id} />
                         <DialogDeleteGroup idGroup={id} groupName={group?.name} />

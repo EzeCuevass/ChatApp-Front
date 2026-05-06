@@ -2,24 +2,27 @@ import React from 'react';
 import '../App.css'
 import DialogLogin from './DialogLogin.jsx';
 import DialogRegister from './DialogRegister.jsx';
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import { UserContext } from '../context/userContext.jsx';
 import { Button } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
+import { API_URL } from '../config.js';
 import { CreateGroup } from './DialogCreateGroup.jsx';
 const Header = () => {
-    // Header component
-    // Displays the logo, app name, and user login/logout options
     const { user, logout } = useContext(UserContext);
     const navigate = useNavigate();
-    // UseEffect to check if the user is logged in
-    useEffect( () => {
 
-    },[user])
+    const handleLogout = async () => {
+        await fetch(`${API_URL}users/logout`, {
+            credentials: 'include'
+        });
+        navigate('/');
+        logout();
+    };
+
     return(
         <header className="header">
             <div className="logo">
-            {/* SVG */}
             <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
                 width="1280.000000pt" height="720.000000pt" viewBox="0 0 1280.000000 720.000000"
                 preserveAspectRatio="xMidYMid meet">
@@ -59,10 +62,7 @@ const Header = () => {
             <div className="user-loged">
                 <p className="usercolor">{user.username}</p>
                     <Button 
-                        onClick={() => {
-                            navigate('/');
-                            logout();
-                        }}
+                        onClick={handleLogout}
                         id="logout-button"
                     > Log out </Button>
                     <CreateGroup />

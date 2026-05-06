@@ -1,57 +1,57 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import { SocketContext } from './socketContext.jsx';
+import { API_URL } from '../config.js';
 
 export const UserContext = createContext();
 export const UserProvider = ({ children }) => {
-    // Initialize user state
-    const [user, setUser] = useState(() => {
-        // Check localStorage for saved user data
-        // If it exists, parse it; otherwise, initialize to null
-        const saved = localStorage.getItem('user');
-        return saved ? JSON.parse(saved) : null;
-    });
-    const [token, setToken] = useState(() => {
-        // Check localStorage for saved token data
-        // If it exists, parse it; otherwise, initialize to null
-        const saved = localStorage.getItem('token');
-        return saved ? JSON.parse(saved) : null;
-    });
-    // Use SocketContext to access the socket instance
+    const [user, setUser] = useState(null);
+    const [token, setToken] = useState(null);
+    const [loading, setLoading] = useState(true);
     const socket = useContext(SocketContext);
-    // Updates localStorage whenever user state changes
+
+    // Restore session from httpOnly cookie on mount
     useEffect(() => {
-        if (user) {
-            localStorage.setItem('user', JSON.stringify(user));
-        } else {
-            localStorage.removeItem('user');
-        }
-        if (token) {
-            localStorage.setItem('token', JSON.stringify(token));
-        } else {
-            localStorage.removeItem('token');
-        }
-    }, [user,token])
+        const restoreSession = async () => {
+            try {
+                const res = await fetch(`${API_URL}users/current`, {
+                    credentials: 'include'
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    setUser(data.user);
+                    setToken(data.token);
+                }
+            } catch (err) {
+                console.log('No session to restore');
+            } finally {
+                setLoading(false);
+            }
+        };
+        restoreSession();
+    }, []);
+
+    // Listen for user updates from socket (groups changed, etc.)
     useEffect(() => {
-        socket.on('userupdated', (updatedUser) => {
-            const newtoken = updatedUser.token;
-            const newUser = updatedUser.user;
-            setToken(newtoken);
-            setUser(newUser);
-        })
-    },[socket])
-    // Function to log in a user
-    const login = (userData, token) => {
+        const handler = (updatedUser) => {
+            setToken(updatedUser.token);
+            setUser(updatedUser.user);
+        };
+        socket.on('userupdated', handler);
+        return () => socket.off('userupdated', handler);
+    }, [socket]);
+
+    const login = useCallback((userData, token) => {
         setToken(token);
         setUser(userData);
-    };
-    // Function to log out a user
-    const logout = () => {
+    }, []);
+
+    const logout = useCallback(() => {
         setUser(null);
         setToken(null);
-    };
-    
+    }, []);
+
     return (
-        <UserContext.Provider value={{ user, login, logout }}>
+        <UserContext.Provider value={{ user, token, login, logout, loading }}>
             {children}
         </UserContext.Provider>
     );

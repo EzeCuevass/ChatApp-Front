@@ -1,70 +1,60 @@
-import React, { useEffect } from "react";
-import { UserContext } from "../context/userContext.jsx";
-import { socket, SocketContext } from "../context/socketContext.jsx";
+import React, { useEffect, useContext } from "react";
+import { SocketContext } from "../context/socketContext.jsx";
 import { useState } from "react";
+
+const EMPTY_MESSAGE = { message: "¡Envia el primer mensaje!" };
+
 export const LastMessage = ({ id }) => {
-    // LastMessage component
-    // Displays the last message in the chat
-    const [lastMessage, setLastMessage] = useState({});
-    useEffect(()=> {
-        // Handler to receive the last message from the server
-        const lastMessageHandler = (lastMessage) => {
-            // If the last message is an object, check if it matches the current chat id
-            if (typeof lastMessage === 'object') {
-                if (id==lastMessage.id){
-                    // Set the last message to the state
-                    if (
-                        !lastMessage.lastmessage ||
-                        !lastMessage.lastmessage.message ||
-                        lastMessage.lastmessage.message.length === 0
-                    ) {
-                        setLastMessage("¡Envia el primer mensaje!");
-                    } else {
-                        setLastMessage(lastMessage.lastmessage);
-                    }
-                }
-                if (lastMessage.user){
-                    setLastMessage(lastMessage);
-                }
-                // If the last message is an object, extract the message property
+    const [lastMessage, setLastMessage] = useState(EMPTY_MESSAGE);
+    const socket = useContext(SocketContext);
+
+    useEffect(() => {
+        const handleGeneralMessage = (msg) => {
+            if (msg && msg.message) {
+                setLastMessage(msg);
             }
-        }
-        
-        
+        };
 
-        // If id is not provided, emits 'getlastmessage' to get the last message for the current user
-        if (!id){
-            socket.emit('getlastmessage')
-            socket.on('lastmessagefront', lastMessageHandler);
+        const handleGroupMessage = (data) => {
+            if (!data || !data.lastmessage) {
+                setLastMessage(EMPTY_MESSAGE);
+                return;
+            }
+            if (data.id === id) {
+                setLastMessage(data.lastmessage);
+            }
+        };
+
+        if (id) {
+            socket.emit('getlastmessageingroup', id);
+            socket.on('lastmessagefrontgroup', handleGroupMessage);
         } else {
-            // If id is provided, emits 'getlastmessageingroup' to get the last message for the specific group
-            socket.emit('getlastmessageingroup', id)
-            socket.on('lastmessagefrontgroup', lastMessageHandler);
+            socket.emit('getlastmessage');
+            socket.on('lastmessagefront', handleGeneralMessage);
         }
-
-        
 
         return () => {
-            // Cleanup function to remove the listener when the component unmounts
-            socket.off('lastmessagefrontgroup', lastMessageHandler);
-            socket.off('lastmessagefront', lastMessageHandler);
-        }
-    },[id])
-    const formatTime = (timestamp) => {
-            if (!timestamp) return "";
-            const date = new Date(timestamp);
-            return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+            socket.off('lastmessagefrontgroup', handleGroupMessage);
+            socket.off('lastmessagefront', handleGeneralMessage);
         };
+    }, [id, socket]);
+
+    const formatTime = (timestamp) => {
+        if (!timestamp) return "";
+        const date = new Date(timestamp);
+        return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    };
+
     return (
         <div className="last-message">
             <p>
                 <strong>
                     {lastMessage.user?.username || lastMessage.user?.name || "Anónimo"}
                 </strong>
-                : {lastMessage.message}
-                <span className="timestamp">
-                    {formatTime(lastMessage.timestamp)}
-                </span>
+                : {lastMessage.message || ""}
+                {lastMessage.timestamp && (
+                    <span className="timestamp"> {formatTime(lastMessage.timestamp)}</span>
+                )}
             </p>
         </div>
     );

@@ -39,7 +39,7 @@ const DialogRegister = () => {
                   <Dialog.Positioner>
                     <Dialog.Content>
                       <Dialog.Header>
-                        <Dialog.Title>Log In</Dialog.Title>
+                        <Dialog.Title>Register</Dialog.Title>
                       </Dialog.Header>
                       <Dialog.Body>
                           <Fieldset.Root size="lg" maxW="md">

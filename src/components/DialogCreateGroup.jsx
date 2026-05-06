@@ -6,35 +6,24 @@ import { useState , useContext} from "react"
 import { SocketContext } from "../context/socketContext.jsx"
 import { UserContext } from "../context/userContext.jsx"
 export const CreateGroup = () => {
-    // Dialog Create Group Component
-    // This component makes a dialog to create a group
     const socket = useContext(SocketContext);
     const { user } = useContext(UserContext);
-    // State to manage input value
     const [inputValue, setInputValue] = useState("");
-    // Extracting the token from localStorage
-    const token = localStorage.getItem('token');
-    const tokenparseado = JSON.parse(token);
-    // Function to handle group creation
+
     async function createGroup(event) {
         event.preventDefault();
         const form = event.target;
         const groupname = form.groupname.value;
-        console.log(user);
-        
-        // Check if the input matches the group name
-        // If it matches, proceed with creation
         await fetch(`${API_URL}group/createGroup`, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
-                "currentUser": tokenparseado
+                "Content-Type": "application/json"
             },
             body: JSON.stringify({
                 "useradmin": user.id,
                 "name": groupname
             })
-        })    
+        })
         socket.emit('updateusers');
     }
     return(
