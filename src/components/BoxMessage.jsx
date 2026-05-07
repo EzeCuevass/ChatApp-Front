@@ -14,23 +14,26 @@ export const BoxMessage = ({ msg }) => {
     const isOwnMessage = msgUsername === currentUsername;
     
     return (
-        // if the message is from the current user, align it to the right, otherwise to the left
         <Box
             key={msg._id}
             display="flex"
             flexDirection="column"
             alignItems={!isOwnMessage ? "flex-start" : "flex-end"}
-            marginBottom="10px"
+            px={4}
+            py={1}
         >
             <Box
-                backgroundColor={!isOwnMessage ? "#E2E8F0" : "#A62639"}
-                color={!isOwnMessage ? "black" : "white"}
-                padding="10px"
+                backgroundColor={!isOwnMessage ? "#3a3f4b" : "#A62639"}
+                color={!isOwnMessage ? "#e8e8e8" : "white"}
+                px={3}
+                py={2}
                 borderRadius="10px"
                 maxWidth="70%"
                 wordBreak="break-word"
+                boxShadow="sm"
             >
-                <strong>{msg.user ? msg.user.username : "Anonymous"}:</strong> {msg.message}
+                <strong style={{ fontSize: "0.85rem" }}>{msg.user ? msg.user.username : "Anonymous"}:</strong>
+                <span style={{ marginLeft: 4 }}>{msg.message}</span>
                 {msg.timestamp && (
                     <div className="timestamp">
                         {formatTimestamp(msg.timestamp)}

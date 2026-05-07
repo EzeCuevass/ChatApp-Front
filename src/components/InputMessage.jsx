@@ -35,13 +35,19 @@ const InputMessage = ({idGroup}) => {
         // If idGroup is provided, it sends messages to a specific group
         // Otherwise, it sends messages to the general chat
         <form onSubmit={idGroup? postmsgGroup : postmsg} className="InputMessage">
-            <Group w={"100%"} h="100%">
+            <Group w={"100%"} h="100%" attached>
                 <Input 
                 placeholder="Write a message..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                ></Input>
-                <Button placeholder="Send" type="submit">Send</Button>
+                bg="#3a3f4b"
+                border="none"
+                color="white"
+                _placeholder={{ color: "#888" }}
+                />
+                <Button type="submit" bg="#A62639" color="white" _hover={{ bg: "#8a1f2f" }}>
+                    Send
+                </Button>
             </Group>
         </form>
     )

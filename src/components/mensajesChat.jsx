@@ -40,13 +40,11 @@ const MensajesChat = () => {
     // Scroll to the bottom of the messages when new messages are added
     scrollDown.current.scrollIntoView({ behavior: 'smooth' });
   }, [mensajes]);
-  return (
-    <div style={{height: "100%", margin: "10px", width: "100%"}}>
+    return (
+    <div style={{ paddingTop: "8px" }}>
         {mensajes.map(msg => (
-          // Map through the messages and render each one using BoxMessage component
           <BoxMessage key={msg._id} msg={msg} />
         ))}
-        {/* Use a ref to scroll to the bottom of the messages */}
         <div ref={scrollDown}></div>
     </div>
   );

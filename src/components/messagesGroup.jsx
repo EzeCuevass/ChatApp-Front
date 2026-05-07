@@ -39,12 +39,10 @@ const MessagesGroup = ({id}) => {
         scrollDown.current.scrollIntoView({ behavior: 'smooth' });
       }, [messagesGroup]);
     return (
-        <div style={{height: "100%", margin: "10px", width: "100%"}}>
-          {/* Map through the messages and render each one using BoxMessage component */}
+        <div style={{ paddingTop: "8px" }}>
                 {messagesGroup.map((msg, index) => (
                     <BoxMessage key={msg._id || index} msg={msg} />
                 ))}
-                {/* Use a ref to scroll to the bottom of the messages */}
                 <div ref={scrollDown}></div>
         </div>
     )

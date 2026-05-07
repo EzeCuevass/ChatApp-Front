@@ -20,7 +20,7 @@ const Main = () => {
                         <LastMessage />
                     </Link>
                 </div>
-                { user ? <ChatsAvailable /> : <p className="individual-chat">Please log in to see your chats</p> }
+                { user ? <ChatsAvailable /> : <p className="individual-chat" style={{ color: "#888", cursor: "default" }}>Inicia sesión para ver tus chats</p> }
             </div>
             <Routes>
                 <Route path="/" element={<GeneralChat />} />
