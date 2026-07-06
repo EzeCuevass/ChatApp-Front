@@ -2,16 +2,11 @@ import { Input, Button, Group} from "@chakra-ui/react"
 import { SocketContext } from "../context/socketContext.jsx";
 import { useContext, useState } from "react";
 import { UserContext } from "../context/userContext.jsx";
-const InputMessage = ({idGroup}) => {
-    // InputMessage component
-    // Handles sending messages in both general and group chats
-    // Uses the SocketContext to access the socket instance
-    // Uses the UserContext to access the current user data
+const InputMessage = ({idGroup, chatId}) => {
     const socket = useContext(SocketContext);
     const { user } = useContext(UserContext);
-    // State to manage the message input
     const [message, setMessage] = useState("");
-    // Function to handle sending messages
+
     const postmsg = async (data) => {
         data.preventDefault();
         if(!message.trim()) return;
@@ -22,7 +17,7 @@ const InputMessage = ({idGroup}) => {
         }
         setMessage("");
     }
-    // Function to handle sending messages in group chats
+
     const postmsgGroup = async (data) => {
         data.preventDefault();
         if(!message.trim()) return;
@@ -30,11 +25,17 @@ const InputMessage = ({idGroup}) => {
         setMessage("");
     }
 
+    const postmsgPrivate = async (data) => {
+        data.preventDefault();
+        if(!message.trim()) return;
+        await socket.emit('sendmessagetoprivate', chatId, message, user.id );
+        setMessage("");
+    }
+
+    const handler = chatId ? postmsgPrivate : (idGroup ? postmsgGroup : postmsg);
+
     return (
-        // Form to handle message input and submission
-        // If idGroup is provided, it sends messages to a specific group
-        // Otherwise, it sends messages to the general chat
-        <form onSubmit={idGroup? postmsgGroup : postmsg} className="InputMessage">
+        <form onSubmit={handler} className="InputMessage">
             <Group w={"100%"} h="100%" attached>
                 <Input 
                 placeholder="Write a message..."

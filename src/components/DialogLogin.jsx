@@ -26,7 +26,7 @@ const DialogLogin = () => {
         password
       }, { withCredentials: true })
       login(res.data.user, res.data.token)
-      socket.emit('setusername', { username: res.data.user.username, token: res.data.token });
+      socket.emit('setusername', { username: res.data.user.username, userId: res.data.user.id });
       setError("");
     } catch (err) {
       const msg = err.response?.data?.message

@@ -6,7 +6,7 @@ import { ChakraProvider , defaultSystem} from '@chakra-ui/react';
 import { BrowserRouter } from 'react-router-dom';
 import { SocketProvider } from './context/socketContext';
 import { UserProvider } from './context/userContext';
-// import MensajesChat from './components/mensajesChat';
+import { OnlineProvider } from './context/OnlineContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -14,9 +14,11 @@ root.render(
     <BrowserRouter>
       <ChakraProvider value={defaultSystem}>
         <SocketProvider>
-          <UserProvider>
-            <App />
-          </UserProvider>
+          <OnlineProvider>
+            <UserProvider>
+              <App />
+            </UserProvider>
+          </OnlineProvider>
         </SocketProvider>
       </ChakraProvider>
     </BrowserRouter>

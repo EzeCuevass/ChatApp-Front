@@ -1,17 +1,20 @@
 import { Button, CloseButton, Dialog, Portal, Text, HStack, VStack, Spinner } from "@chakra-ui/react"
 import { Field, Fieldset, Input } from "@chakra-ui/react"
 import { useEffect, useState, useContext, useRef } from "react"
+import { useNavigate } from "react-router-dom"
 import { API_URL } from "../config.js"
-import { SocketContext } from "../context/socketContext.jsx"
 import { UserContext } from "../context/userContext.jsx"
+import { SocketContext } from "../context/socketContext.jsx"
 import { Avatar } from "./ui/Avatar.jsx"
 
-const ResultItem = ({ user, isMember, onAdd }) => (
+const ResultItem = ({ user, onClick }) => (
     <HStack
         justify="space-between"
         p={2}
         borderRadius="md"
         _hover={{ bg: "#3a3f4b" }}
+        cursor="pointer"
+        onClick={onClick}
         transition="background 0.15s"
     >
         <HStack gap={2}>
@@ -21,51 +24,37 @@ const ResultItem = ({ user, isMember, onAdd }) => (
                 <Text fontSize="sm" color="#888">@{user.username}</Text>
             </VStack>
         </HStack>
-        {isMember ? (
-            <Text fontSize="sm" color="#888" fontStyle="italic">Ya es miembro</Text>
-        ) : (
-            <Button size="sm" bg="#A62639" color="white" _hover={{ bg: "#8a1f2f" }} onClick={(e) => onAdd(e, user._id || user.id)}>
-                Agregar
-            </Button>
-        )}
+        <Button size="sm" bg="#A62639" color="white" _hover={{ bg: "#8a1f2f" }}>
+            Chatear
+        </Button>
     </HStack>
 )
 
-export const DialogAddMember = ({idGroup}) => {
+export const DialogStartChat = () => {
     const [inputValue, setInputValue] = useState("");
     const [searchResults, setSearchResults] = useState([]);
-    const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");
     const [searching, setSearching] = useState(false);
+    const [error, setError] = useState("");
     const timerRef = useRef(null);
-
-    const socket = useContext(SocketContext);
+    const navigate = useNavigate();
     const { user, token } = useContext(UserContext);
+    const socket = useContext(SocketContext);
 
-    async function addMember(event, userId) {
-        event.preventDefault();
+    async function startChat(userId) {
         setError("");
-        setSuccess("");
         try {
-            const res = await fetch(`${API_URL}group/addMembers`, {
-                method: "PUT",
+            const res = await fetch(`${API_URL}privatechat/${userId}`, {
+                method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "currentUser": token
                 },
-                body: JSON.stringify({
-                    "member": userId,
-                    "idgroup": idGroup
-                })
-            })
-            if (!res.ok) {
-                const data = await res.json().catch(() => ({}));
-                throw new Error(data.error || "Error al agregar miembro");
-            }
-            setSuccess("Miembro agregado correctamente");
-            setInputValue("");
-            setSearchResults([]);
-            socket.emit('updateusers')
+                credentials: "include"
+            });
+            if (!res.ok) throw new Error("Error al iniciar chat");
+            const chat = await res.json();
+            socket.emit('updateusers');
+            navigate(`/private/${chat._id}`);
         } catch (err) {
             setError(err.message);
         }
@@ -90,16 +79,14 @@ export const DialogAddMember = ({idGroup}) => {
             setSearchResults([]);
             setSearching(false);
         }
-        return () => {
-            if (timerRef.current) clearTimeout(timerRef.current);
-        }
+        return () => { if (timerRef.current) clearTimeout(timerRef.current) }
     }, [inputValue]);
 
     return (
         <Dialog.Root>
             <Dialog.Trigger asChild>
                 <Button size="md">
-                    Add Member
+                    Nuevo chat
                 </Button>
             </Dialog.Trigger>
             <Portal>
@@ -108,7 +95,7 @@ export const DialogAddMember = ({idGroup}) => {
                     <Dialog.Positioner>
                         <Dialog.Content bg="#282c34" color="white">
                             <Dialog.Header>
-                                <Dialog.Title color="#E2F1AF">Agregar miembro</Dialog.Title>
+                                <Dialog.Title color="#E2F1AF">Nuevo chat privado</Dialog.Title>
                             </Dialog.Header>
                             <Dialog.Body>
                                 <Fieldset.Root size="lg" maxW="md">
@@ -118,15 +105,9 @@ export const DialogAddMember = ({idGroup}) => {
                                                 {error}
                                             </Text>
                                         )}
-                                        {success && (
-                                            <Text color="green.400" fontSize="sm" mb={2} p={2} bg="#1a3a1a" borderRadius="md">
-                                                {success}
-                                            </Text>
-                                        )}
                                         <Field.Root>
                                             <Field.Label color="#aaa">Buscar usuario</Field.Label>
                                             <Input
-                                                name="username"
                                                 placeholder="Escribe un nombre de usuario..."
                                                 value={inputValue}
                                                 onChange={e => setInputValue(e.target.value)}
@@ -149,8 +130,7 @@ export const DialogAddMember = ({idGroup}) => {
                                                         <ResultItem
                                                             key={u._id || u.id}
                                                             user={u}
-                                                            isMember={u.groups?.length > 0 && u.groups.some(g => g?.group?._id === idGroup)}
-                                                            onAdd={addMember}
+                                                            onClick={() => startChat(u._id || u.id)}
                                                         />
                                                     ))
                                                     : <Text color="#666" textAlign="center" py={2}>No se encontraron usuarios</Text>
@@ -161,9 +141,6 @@ export const DialogAddMember = ({idGroup}) => {
                                 </Fieldset.Root>
                             </Dialog.Body>
                             <Dialog.Footer>
-                                <Dialog.ActionTrigger asChild>
-                                    <Button variant="outline" colorScheme="whiteAlpha">Cancelar</Button>
-                                </Dialog.ActionTrigger>
                                 <Dialog.CloseTrigger asChild>
                                     <Button variant="outline" colorScheme="whiteAlpha">Cerrar</Button>
                                 </Dialog.CloseTrigger>
@@ -177,4 +154,4 @@ export const DialogAddMember = ({idGroup}) => {
             </Portal>
         </Dialog.Root>
     )
-}
+};

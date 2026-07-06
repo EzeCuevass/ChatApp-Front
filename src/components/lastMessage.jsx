@@ -4,7 +4,7 @@ import { useState } from "react";
 
 const EMPTY_MESSAGE = { message: "¡Envia el primer mensaje!" };
 
-export const LastMessage = ({ id }) => {
+export const LastMessage = ({ id, chatId }) => {
     const [lastMessage, setLastMessage] = useState(EMPTY_MESSAGE);
     const socket = useContext(SocketContext);
 
@@ -25,7 +25,20 @@ export const LastMessage = ({ id }) => {
             }
         };
 
-        if (id) {
+        const handlePrivateMessage = (data) => {
+            if (!data || !data.message) {
+                setLastMessage(EMPTY_MESSAGE);
+                return;
+            }
+            if (data.chatId === chatId) {
+                setLastMessage(data.message);
+            }
+        };
+
+        if (chatId) {
+            socket.emit('getlastmessageinprivate', chatId);
+            socket.on('lastmessagefrontprivate', handlePrivateMessage);
+        } else if (id) {
             socket.emit('getlastmessageingroup', id);
             socket.on('lastmessagefrontgroup', handleGroupMessage);
         } else {
@@ -34,10 +47,11 @@ export const LastMessage = ({ id }) => {
         }
 
         return () => {
-            socket.off('lastmessagefrontgroup', handleGroupMessage);
             socket.off('lastmessagefront', handleGeneralMessage);
+            socket.off('lastmessagefrontgroup', handleGroupMessage);
+            socket.off('lastmessagefrontprivate', handlePrivateMessage);
         };
-    }, [id, socket]);
+    }, [id, chatId, socket]);
 
     const formatTime = (timestamp) => {
         if (!timestamp) return "";
